@@ -4,13 +4,13 @@ pipeline {
     stages {
         stage('Clone') {
             steps {
-                git 'https://github.com/DIAS35/war-build-docker.git'
+                git 'https://github.com/priximmo/ansible-jenkins.git'
             }
         }
 
-        stage('Maven package') {
+        stage('Ansible') {
             steps {
-                sh 'mvn clean package'
+                sh 'ansible-playbook -i hosts.yml playbook.yml'
             }
         }
     }
