@@ -1,27 +1,56 @@
+def pipelineContext = [:]
 node {
-    def registryProjet = 'registry.gitlab.com/xavki/presentations-jenkins'
-    def IMAGE = "${registryProjet}:version-${env.BUILD_ID}"
+
+   def registryProjet='registry.gitlab.com/xavki/presentations-jenkins'
+	 def IMAGE="${registryProjet}:version-${env.BUILD_ID}"
+
+	 echo "IMAGE = $IMAGE"
 
     stage('Clone') {
-        git 'https://github.com/DIAS35/jbuild.git'
-    }
+    			checkout scm
+		}
 
-    def img
-    stage('Build') {
-        img = docker.build("$IMAGE", '.')
-    }
+		def img = stage('Build') {
+					docker.build("$IMAGE",  '.')
+		}
+	
+		stage('Run') {
+					img.withRun("--name run-$BUILD_ID -p 80:80") { c ->
+						sh 'curl localhost'
+          }					
+		}
 
-    stage('Run') {
-        img.withRun("--name run-${env.BUILD_ID} -p 80:80") { c ->
-            sh 'docker logs run-${env.BUILD_ID}'
-            sh 'curl localhost'
-        }
-    }
-
-    stage('Push') {
-        docker.withRegistry('https://registry.gitlab.com', 'reg1') {
-            img.push 'latest'
-        }
-    }
+		stage('Push') {
+					docker.withRegistry('https://registry.gitlab.com', 'reg1') {
+							img.push 'latest'
+              img.push()
+					}
+		}
+ 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
