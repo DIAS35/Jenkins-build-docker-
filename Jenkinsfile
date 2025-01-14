@@ -1,22 +1,3 @@
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 node {
     def registryProjet = 'registry.gitlab.com/xavki/presentations-jenkins'
     def IMAGE = "${registryProjet}:version-${env.BUILD_ID}"
@@ -43,9 +24,4 @@ node {
         }
     }
 }
-
-
-
-
-
 
