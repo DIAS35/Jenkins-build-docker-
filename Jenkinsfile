@@ -1,20 +1,26 @@
-node{
-  def app
+node {
+    def registryProjet = 'registry.gitlab.com/xavki/presentations-jenkins'
+    def IMAGE = "${registryProjet}:version-${env.BUILD_ID}"
 
     stage('Clone') {
-        checkout scm
+        git 'https://github.com/DIAS35/jbuild.git'
     }
 
-    stage('Build image') {
-        app = docker.build("xavki/nginx")
+    def img
+    stage('Build') {
+        img = docker.build("$IMAGE", '.')
     }
 
-    stage('Test image') {
-        docker.image('xavki/nginx').withRun('-p 80:80') { c ->
-        sh 'docker ps'
-        sh 'curl localhost'
-	     }
+    stage('Run') {
+        img.withRun("--name run-${env.BUILD_ID} -p 80:80") { c ->
+            sh 'docker logs run-${env.BUILD_ID}'
+            sh 'curl localhost'
+        }
+    }
+
+    stage('Push') {
+        docker.withRegistry('https://registry.gitlab.com', 'reg1') {
+            img.push 'latest'
+        }
     }
 }
-
-
